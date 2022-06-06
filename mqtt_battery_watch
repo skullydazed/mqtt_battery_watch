@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import re
+import os
+
+import paho.mqtt.client
+from dhooks import Webhook
+from gourd import Gourd
+
+DEBUG = os.environ.get('DEBUG') == '1'
+CHARGER_MONITOR = os.environ.get('CHARGER_MONITOR', 'zwave/Office/OfficeTubPlugs/50/1/value/66049')
+CHARGER_THRESHOLD = float(os.environ.get('CHARGER_THRESHOLD', '10'))
+CHARGER_SWITCH = os.environ.get('CHARGER_SWITCH', 'zwave/Office/OfficeTubPlugs/37/1/targetValue/set')
+CHARGER_SWITCH_OFF = os.environ.get('CHARGER_SWITCH_OFF', 'false')
+MQTT_CLIENT_ID = os.environ.get('MQTT_CLIENT_ID', 'mqtt_battery_watch')
+MQTT_HOST = os.environ.get('MQTT_HOST', 'localhost')
+MQTT_PORT = int(os.environ.get('MQTT_PORT', '1883'))
+MQTT_USER = os.environ.get('MQTT_USER', '')
+MQTT_PASS = os.environ.get('MQTT_PASS', '')
+
+mqtt = Gourd(app_name=MQTT_CLIENT_ID, mqtt_host=MQTT_HOST, mqtt_port=MQTT_PORT, username=MQTT_USER, password=MQTT_PASS)
+state = {
+    'currently_charging': False
+}
+
+
+@mqtt.subscribe(CHARGER_MONITOR)
+def on_message(msg):
+    if state['currently_charging'] and msg.json['value'] < CHARGER_THRESHOLD:
+        mqtt.publish('discord/bike_battery', f'Charging stopped, {msg.json["value"]} watts in use.')
+        mqtt.publish(CHARGER_SWITCH, CHARGER_SWITCH_OFF)
+        state['currently_charging'] = False
+    elif not state['currently_charging'] and msg.json['value'] > CHARGER_THRESHOLD:
+        mqtt.publish('discord/bike_battery', f'Charging started, {msg.json["value"]} watts in use.')
+        state['currently_charging'] = True
+
+
+if __name__ == '__main__':
+    # Setup and start the mqtt app
+    mqtt.run_forever()

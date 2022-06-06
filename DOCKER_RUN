@@ -1,0 +1,2 @@
+# Settings used by ~/bin/docker_deploy
+DOCKER_RUN_ARGS='-e DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/784219264227344414/P2VLBqtYcaStbFhKQHJcjcY-cmKZFqMEHtEKQSOwoaKbKSfhuznwwD64Hvv9UOlEnDGH -e MQTT_HOST=mosquitto --network=mqtt mqtt_battery_watch'

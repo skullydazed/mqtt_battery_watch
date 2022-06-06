@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch MQTT for messages to send to discord
+After=network.target
+
+[Service]
+User=zwhite
+Environment=MQTT_HOST=127.0.0.1
+ExecStart=/home/zwhite/mqtt_battery_watch/mqtt_battery_watch
+
+[Install]
+WantedBy=multi-user.target
