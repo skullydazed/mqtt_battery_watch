@@ -1,11 +1,12 @@
 [Unit]
 Description=Watch MQTT for messages to send to discord
-After=network.target
+After=network.target mosquitto.service
 
 [Service]
 User=zwhite
 Environment=MQTT_HOST=127.0.0.1
-ExecStart=/home/zwhite/mqtt_battery_watch/mqtt_battery_watch
+WorkingDirectory=/home/zwhite/home_automation/mqtt_battery_watch
+ExecStart=/home/zwhite/home_automation/mqtt_battery_watch/.venv/bin/python /home/zwhite/home_automation/mqtt_battery_watch/mqtt_battery_watch
 
 [Install]
 WantedBy=multi-user.target

@@ -24,11 +24,11 @@ state = {
 @mqtt.subscribe(CHARGER_MONITOR)
 def on_message(msg):
     if state['currently_charging'] and msg.json['value'] < CHARGER_THRESHOLD:
-        mqtt.publish('discord/bike_battery', f'Charging stopped, {msg.json["value"]} watts in use.')
+        mqtt.publish('ntfy/bike_battery', f'Charging stopped, {msg.json["value"]} watts in use.')
         mqtt.publish(CHARGER_SWITCH, CHARGER_SWITCH_OFF)
         state['currently_charging'] = False
     elif not state['currently_charging'] and msg.json['value'] > CHARGER_THRESHOLD:
-        mqtt.publish('discord/bike_battery', f'Charging started, {msg.json["value"]} watts in use.')
+        mqtt.publish('ntfy/bike_battery', f'Charging started, {msg.json["value"]} watts in use.')
         state['currently_charging'] = True
 
 
